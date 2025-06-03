@@ -3,12 +3,12 @@
     "description": "Leetcode Companion Chrome Extension",
     "version": "1.0",
     "manifest_version": 3,
-    "permissions": ["scripting", "activeTab"],
+    "permissions": ["scripting", "tabs"],
     "host_permissions": ["https://leetcode.com/*"],
     "content_scripts": [
         {
             "matches": ["https://leetcode.com/*"],
-            "js": ["content_scripts/content.js"],
+            "js": ["scripts/content.js"],
             "run_at": "document_idle"
         }
     ],
