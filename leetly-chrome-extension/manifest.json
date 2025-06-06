@@ -3,6 +3,7 @@
     "description": "Leetcode Companion Chrome Extension",
     "version": "1.0",
     "manifest_version": 3,
+    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2W9WffhKTOGd5lD3ijMdwJ8a75dxWSziMU5ZNYwU6o4P54m4kksXfk3jrNfa+Jk7CIbk7UWGbCT33HU3d78SwAkrYNdjIQiQuIRdWOwkmJixnWtH/PhabylEyNKI4g7KUqmTwl/rV4iLEn/7fOU8zBe/Sii9W946W0SnJy3mU6Ul4XttjSYdiMppjLCW4JRecFW4SahMLGxNFGqTlid+UROLWro9dZYWSFcwvUyNzTlPwzm4v4N6v/QtyKxH9dL9JTD38dNIm0wHowIA1KzSzWJp0AjQG8Agy/mEzH7YMvFqNafMkkUipvzrAUS4fmJ8PqlWnOLmkL+pLzsUbwk6fQIDAQAB",
     "permissions": ["scripting", "tabs"],
     "host_permissions": ["https://leetcode.com/*"],
     "content_scripts": [
