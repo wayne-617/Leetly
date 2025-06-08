@@ -1,19 +1,45 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
-
 const {onRequest} = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
+const fetch = require("node-fetch");
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+exports.exchangeToken = onRequest(async (req, res) => {
+    if (req.method !== "POST") {
+        res.status(405).send("Method Not Allowed");
+        return;
+    }
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+    const {code } = req.body;
+    if (!code) {
+        res.status(400).send("Bad Request: 'code' is required");
+        return;
+    }
+
+    const clientId = functions.config().github.clientId;
+    const clientSecret = functions.config().github.clientSecret;
+
+    try {
+        const response = await fetch("https://github.com/login/oauth/access_token", {
+            method: "POST",
+            headers: { "Accept": "application/json" },
+            body: new URLSearchParams({
+                client_id: clientId,
+                client_secret: clientSecret,
+                code
+            }),
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            logger.error("GitHub OAuth error:", data.error);
+            res.status(400).send(`Error: ${data.error_description || data.error}`);
+            return;
+        }
+
+        logger.info("Access token received:", data.access_token);
+        res.json(data);
+    } catch (error) {
+        logger.error("Error exchanging token:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
