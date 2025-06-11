@@ -2,7 +2,24 @@ const {onRequest} = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
 const fetch = require("node-fetch");
 
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 min
+const MAX_REQUESTS = 10; // Max requests
+
+const rateLimitMap = new Map();
+
 exports.exchangeToken = onRequest(async (req, res) => {
+    const ip = req.headers['x-forwarded-for'] || req.ip;
+    const now = Date.now();
+
+    const timestamp = rateLimitMap.get(ip) || [];
+    const recent = timestamp.filter(time => now - time < RATE_LIMIT_WINDOW);
+    recent.push(now);
+    rateLimitMap.set(ip, recent);
+
+    if (recent.length > MAX_REQUESTS) {
+        return res.status(429).send("Too Many Requests: Rate limit exceeded");
+    }
+
     if (req.method !== "POST") {
         res.status(405).send("Method Not Allowed");
         return;
