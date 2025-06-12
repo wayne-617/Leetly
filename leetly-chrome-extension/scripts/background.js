@@ -20,5 +20,34 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const authUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=repo`;
 
         console.log("Redirecting to GitHub OAuth:", authUrl);
+
+        chrome.identity.launchWebAuthFlow({
+            url: authUrl,
+            interactive: true
+        }, async (redirectUrl) => {
+            if (chrome.runtime.lastError || !redirectUrl) {
+                sendResponse({ error: chrome.runtime.lastError });
+                return;
+            }
+
+            const url = new URL(redirectUrl);
+            const code = url.searchParams.get("code");
+
+            if (!code) {
+                console.error("No code received from GitHub OAuth");
+                sendResponse({ status: "error", message: "No code received" });
+                return;
+            }
+
+            const response = await fetch("PLACEHOLDER", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code })
+            })
+            
+            const { access_token } = await response.json();
+            sendResponse({ accessToken: access_token})
+        });
+        return true;
     }
 });
