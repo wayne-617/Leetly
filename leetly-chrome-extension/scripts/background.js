@@ -1,4 +1,5 @@
-// background script
+import API_ENDPOINT from './config.js';
+
 chrome.tabs.onUpdated.addListener((tabId, tab) => {
     if (tab.url && tab.url.includes('leetcode.com') && tab.url.includes('/submissions/')) {
         const urlParts = tab.url.split('/');
@@ -39,7 +40,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 return;
             }
 
-            const response = await fetch("PLACEHOLDER", {
+            const response = await fetch(API_ENDPOINT, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ code })
