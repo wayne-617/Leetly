@@ -23,9 +23,9 @@
 
 ### Chrome Extension
 - Manifest V3
-- React
-- Tailwind CSS
-- Chrome Storage API & Alarms API
+- JavaScript
+- HTML/CSS
+- Firebase
 
 ### Web App
 - Next.js + React
