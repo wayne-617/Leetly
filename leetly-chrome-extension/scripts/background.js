@@ -49,6 +49,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const { access_token } = await response.json();
             sendResponse({ accessToken: access_token})
         });
+
+        chrome.storage.local.set({ githubToken: access_token }, () => {
+            console.log("GitHub token stored in local storage.");
+        });
+        
         return true;
     }
 });
