@@ -1,4 +1,4 @@
-import API_ENDPOINT from './config.js';
+importScripts('../config.js');
 
 chrome.tabs.onUpdated.addListener((tabId, tab) => {
     if (tab.url && tab.url.includes('leetcode.com') && tab.url.includes('/submissions/')) {
@@ -45,15 +45,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ code })
             })
+
+            if (!response.ok) {
+                const text = await response.text(); // handle plain text error
+                console.error("Server error response:", text);
+                sendResponse({ error: `Server responded with ${response.status}: ${text}` });
+                return;
+            }
             
             const { access_token } = await response.json();
-            sendResponse({ accessToken: access_token})
-        });
 
-        chrome.storage.local.set({ githubToken: access_token }, () => {
-            console.log("GitHub token stored in local storage.");
+            chrome.storage.local.set({ githubToken: access_token }, () => {
+                console.log("GitHub token stored in local storage.");
+            });
+            sendResponse({ accessToken: access_token })
         });
-        
         return true;
     }
 });

@@ -8,6 +8,15 @@ const MAX_REQUESTS = 10; // Max requests
 const rateLimitMap = new Map();
 
 exports.exchangeToken = onRequest(async (req, res) => {
+
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+
+    if (req.method === "OPTIONS") {
+        res.status(204).send(""); // No Content
+        return;
+    }
     const ip = req.headers['x-forwarded-for'] || req.ip;
     const now = Date.now();
 
@@ -31,13 +40,18 @@ exports.exchangeToken = onRequest(async (req, res) => {
         return;
     }
 
-    const clientId = functions.config().github.clientId;
-    const clientSecret = functions.config().github.clientSecret;
+    const clientId = process.env.GITHUB_CLIENTID;
+    const clientSecret = process.env.GITHUB_CLIENTSECRET;
 
+    logger.info("Received code:", code);
+    logger.info(`Client ID: ${clientId}`);
+    logger.info(`Client Secret length: ${clientSecret ? clientSecret.length : 'undefined'}`);
+
+    
     try {
         const response = await fetch("https://github.com/login/oauth/access_token", {
             method: "POST",
-            headers: { "Accept": "application/json" },
+            headers: { Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded"},
             body: new URLSearchParams({
                 client_id: clientId,
                 client_secret: clientSecret,
@@ -46,6 +60,7 @@ exports.exchangeToken = onRequest(async (req, res) => {
         });
 
         const data = await response.json();
+        console.log("Response from GitHub:", data);
 
         if (data.error) {
             logger.error("GitHub OAuth error:", data.error);
