@@ -27,3 +27,24 @@ document.getElementById("connect").addEventListener("click", async () => {
         }
     });
 })
+
+document.getElementById("create-repo").addEventListener("click", async () => {
+    const repoName = document.getElementById("repo-name").value.trim();
+    if (!repoName) {
+        document.getElementById("status").textContent = "Please enter a repository name.";
+        return;
+    }
+
+    chrome.runtime.sendMessage({ type: "create-repo", repoName }, async (response) => {
+        if (response.error) {
+            document.getElementById("status").textContent = `Error: ${response?.message || "Unknown error"}`;
+            return;
+        }
+
+        if (response.success) {
+            document.getElementById("status").textContent = `Repository '${repoName}' created successfully!`;
+        } else {
+            alert("Failed to create repository. Please try again.");
+        }
+    });
+});
