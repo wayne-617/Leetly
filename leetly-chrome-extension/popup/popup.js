@@ -1,5 +1,14 @@
 document.getElementById("status").textContent = "Click 'Connect' to authenticate with GitHub.";
 
+chrome.storage.local.get("githubToken", ({ githubToken }) => {
+  if (githubToken) {
+    document.getElementById("connect").style.display = "none";
+    document.getElementById("status").textContent = "Connected!";
+  } else {
+    document.getElementById("status").textContent = "Not connected";
+  }
+});
+
 document.getElementById("connect").addEventListener("click", async () => {
     console.log("Connecting to GitHub...");
     chrome.runtime.sendMessage({ type: "github-auth" }, async (response) => {
