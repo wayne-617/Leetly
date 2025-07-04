@@ -52,7 +52,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 sendResponse({ error: `Server responded with ${response.status}: ${text}` });
                 return;
             }
-            
+
             const { access_token } = await response.json();
 
             chrome.storage.local.set({ githubToken: access_token }, () => {
@@ -61,5 +61,48 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             sendResponse({ accessToken: access_token })
         });
         return true;
+    }
+});
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.type === "create-repo") {
+        const { repoName } = request;
+
+        chrome.storage.local.get("githubToken", async ({ githubToken }) => {
+            if (!githubToken) {
+                sendResponse({ error: "Not authenticated with GitHub." });
+                return;
+            }
+            const response = await fetch("https://api.github.com/user/repos", {
+                method: "POST",
+                headers: {
+                    "Authorization": `token ${githubToken}`,
+                    "Accept": "application/vnd.github+json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: repoName,
+                    description: "Auto-uploaded LeetCode solutions",
+                    private: true
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.full_name) {
+                        chrome.storage.local.set({ githubRepo: data.full_name }, () => {
+                            sendResponse({ status: "success", repo: data.full_name });
+                        });
+                    } else {
+                        sendResponse({ status: "error", message: data.message || "Failed to create repo" });
+                    }
+                })
+                .catch(err => {
+                    sendResponse({ status: "error", message: err.message });
+                });
+
+            return true; // keep response channel open
+        });
+
+        return true; // keep sendResponse open
     }
 });
