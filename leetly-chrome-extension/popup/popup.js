@@ -9,6 +9,14 @@ chrome.storage.local.get("githubToken", ({ githubToken }) => {
   }
 });
 
+chrome.storage.local.get("githubRepo", ({ githubRepo }) => {
+    if (githubRepo) {  
+        document.getElementById("repo-name").style.display = "none";
+        document.getElementById("create-repo").style.display = "none";
+        document.getElementById("status").textContent = `Using repository: ${githubRepo}`;
+    }
+});
+
 document.getElementById("connect").addEventListener("click", async () => {
     console.log("Connecting to GitHub...");
     chrome.runtime.sendMessage({ type: "github-auth" }, async (response) => {
