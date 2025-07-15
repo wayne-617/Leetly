@@ -1,5 +1,29 @@
 importScripts('../config.js');
 
+function getSubmissionData() {
+    const code = document.querySelector("code[class^='language-']");
+    const problemTitle = document.querySelector("a[href^='/problems/']");
+
+    if (code) {
+        const codeText = code.innerText;
+        console.log("Code text found:", codeText);
+    } else {
+        console.log("No code text found.");
+    }
+
+    if (problemTitle) {
+        const problemTitleText = problemTitle.innerText;
+        const dotIndex = problemTitleText.indexOf('.');
+        const problemNumber = problemTitleText.substring(0, dotIndex);
+        const problemName = problemTitleText.substring(dotIndex + 1).trim();
+
+        console.log("Problem number found:", problemNumber);
+        console.log("Problem name found:", problemName);
+    } else {
+        console.log("No problem title found.");
+    }
+}
+
 chrome.tabs.onUpdated.addListener((tabId, tab) => {
     if (tab.url && tab.url.includes('leetcode.com') && tab.url.includes('/submissions/')) {
         const urlParts = tab.url.split('/');
