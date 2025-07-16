@@ -3,6 +3,8 @@ importScripts('../config.js');
 function getSubmissionData() {
     const code = document.querySelector("code[class^='language-']");
     const problemTitle = document.querySelector("a[href^='/problems/']");
+    const codeLanguage = document.querySelector('div.flex.items-center.gap-2.text-sm.font-medium.text-text-tertiary.dark\\:text-text-tertiary');
+    const submissionDate = document.querySelector("span.max-w-full.truncate")
 
     if (code) {
         const codeText = code.innerText;
@@ -22,6 +24,22 @@ function getSubmissionData() {
     } else {
         console.log("No problem title found.");
     }
+
+    if (codeLanguage) {
+        const language = codeLanguage.lastChild.textContent.trim();
+        console.log("Code language found:", language);
+    } else {
+        console.log("No code language found.");
+    }
+
+    if (submissionDate) {
+        const dateText = submissionDate.textContent.trim();
+        console.log("Submission date found:", dateText);
+    } else {
+        console.log("No submission date found.");
+    }
+
+
 }
 
 chrome.tabs.onUpdated.addListener((tabId, tab) => {
