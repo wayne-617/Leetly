@@ -1,13 +1,61 @@
 importScripts('../config.js');
 
+function getSubmissionData() {
+    const code = document.querySelector("code[class^='language-']");
+    const problemTitle = document.querySelector("a[href^='/problems/']");
+    const codeLanguage = document.querySelector('div.flex.items-center.gap-2.text-sm.font-medium.text-text-tertiary.dark\\:text-text-tertiary');
+    const submissionDate = document.querySelector("span.max-w-full.truncate")
+
+    if (code) {
+        const codeText = code.innerText;
+        console.log("Code text found:", codeText);
+    } else {
+        console.log("No code text found.");
+    }
+
+    if (problemTitle) {
+        const problemTitleText = problemTitle.innerText;
+        const dotIndex = problemTitleText.indexOf('.');
+        const problemNumber = problemTitleText.substring(0, dotIndex);
+        const problemName = problemTitleText.substring(dotIndex + 1).trim();
+
+        console.log("Problem number found:", problemNumber);
+        console.log("Problem name found:", problemName);
+    } else {
+        console.log("No problem title found.");
+    }
+
+    if (codeLanguage) {
+        const language = codeLanguage.lastChild.textContent.trim();
+        console.log("Code language found:", language);
+    } else {
+        console.log("No code language found.");
+    }
+
+    if (submissionDate) {
+        const dateText = submissionDate.textContent.trim();
+        console.log("Submission date found:", dateText);
+    } else {
+        console.log("No submission date found.");
+    }
+
+    return {
+        code: code ? code.innerText : null,
+        problemTitle: problemTitle ? problemTitle.innerText : null,
+        codeLanguage: codeLanguage ? codeLanguage.lastChild.textContent.trim() : null,
+        submissionDate: submissionDate ? submissionDate.textContent.trim() : null
+    };
+}
+
 chrome.tabs.onUpdated.addListener((tabId, tab) => {
     if (tab.url && tab.url.includes('leetcode.com') && tab.url.includes('/submissions/')) {
         const urlParts = tab.url.split('/');
         const urlParameters = new URLSearchParams(tab.url.split('?')[1]);
-        const name = urlParts[urlParts.length - 4];
-        const date = urlParameters.get("envId");
+        params = getSubmissionData();
+        /* const name = urlParts[urlParts.length - 4];
+        const date = urlParameters.get("envId"); */
 
-        chrome.tabs.sendMessage(tabId, { type: "submission", name: name, date: date }, (response) => {
+        chrome.tabs.sendMessage(tabId, { type: "submission", ...params }, (response) => {
             console.log('Message sent to content script');
             console.log("Response from content script: ", response);
         });
