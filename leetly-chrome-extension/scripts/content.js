@@ -15,6 +15,9 @@
                     return;
                 }
             });
+
+            const fileName = `${problemTitle.replace(/[^a-zA-Z0-9]/g, "_")}.${codeLanguage}`;
+            const fileContent = `// LeetCode submission for ${problemTitle}\n// Language: ${codeLanguage}\n// Date: ${submissionDate}\n\n${code}`;
         }
     });
 })();
