@@ -23,6 +23,30 @@
                 message: `Add solution for ${problemTitle}`,
                 content: btoa(code),
             }
+
+            fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${githubAccessToken}`,
+                    "Accept": "application/vnd.github+json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to upload file");
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("File uploaded successfully:", data);
+                response({ status: "success", message: "File uploaded successfully." });
+            })
+            .catch(error => {
+                console.error("Error uploading file:", error);
+                response({ status: "error", message: "Error uploading file." });
+            });
         }
     });
 })();
